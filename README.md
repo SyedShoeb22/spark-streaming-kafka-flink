@@ -1,2 +1,124 @@
 # spark-streaming-kafka-flink
-spark-streaming-kafka-flink
+
+✅ Kafka Setup (shared across examples)
+Create a Kafka topic:
+```bash
+
+docker exec -it kafka kafka-topics --create \
+  --topic test-topic \
+  --bootstrap-server kafka:9092 \
+  --replication-factor 1 \
+  --partitions 1
+```
+Produce test data to Kafka:
+```bash
+docker exec -it kafka kafka-console-producer \
+  --topic test-topic \
+  --bootstrap-server kafka:9092
+```
+Type some messages like:
+```bash
+hello
+spark
+flink
+streaming
+```
+then ctrl + c
+
+🧪 Example 1: Spark Structured Streaming from Kafka
+🔸 Create PySpark script: spark_kafka_stream.py
+```bash
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import expr
+
+spark = SparkSession.builder \
+    .appName("KafkaSparkStreaming") \
+    .master("spark://spark:7077") \
+    .getOrCreate()
+
+spark.sparkContext.setLogLevel("WARN")
+
+# Read stream from Kafka
+df = spark.readStream.format("kafka") \
+    .option("kafka.bootstrap.servers", "kafka:9092") \
+    .option("subscribe", "test-topic") \
+    .option("startingOffsets", "latest") \
+    .load()
+
+# Convert binary to string
+value_df = df.selectExpr("CAST(value AS STRING) as message")
+
+# Simple transformation
+words_df = value_df.selectExpr("split(message, ' ') as words")
+
+# Output to console
+query = words_df.writeStream \
+    .outputMode("append") \
+    .format("console") \
+    .start()
+
+query.awaitTermination()
+```
+
+🔸 Copy script into the spark container:
+```bash
+docker cp spark_kafka_stream.py spark:/tmp/
+```
+
+🔸 Run the script inside the container:
+```bash
+docker exec -it spark bash
+spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0 /tmp/spark_kafka_stream.py
+```
+
+🧪 Example 2: Flink Kafka Streaming Job (Flink SQL CLI)
+Step 1: Start Flink SQL CLI:
+```bash
+
+docker exec -it flink-jobmanager bash
+./bin/sql-client.sh
+```
+
+Step 2: Run the following SQL commands:
+```bash
+-- Create source table
+CREATE TABLE kafka_source (
+  `value` STRING
+) WITH (
+  'connector' = 'kafka',
+  'topic' = 'test-topic',
+  'properties.bootstrap.servers' = 'kafka:9092',
+  'properties.group.id' = 'flink-group',
+  'format' = 'raw',
+  'scan.startup.mode' = 'latest-offset'
+);
+
+-- Create print sink
+CREATE TABLE print_sink (
+  `value` STRING
+) WITH (
+  'connector' = 'print'
+);
+
+-- Stream data
+INSERT INTO print_sink
+SELECT * FROM kafka_source;
+```
+✅ 3. Send messages to the topic
+In a separate terminal, produce some Kafka messages:
+```bash
+docker exec -it kafka kafka-console-producer --topic test-topic --bootstrap-server kafka:9092
+```
+Type a few lines:
+```bash
+flink test
+flink + kafka rocks
+hello again
+```
+✅ 6. See output in Flink logs
+In your Flink JobManager container logs, you’ll now see lines like:
+```bash
++I[flink test]
++I[flink + kafka rocks]
++I[hello again]
+```
