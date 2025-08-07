@@ -137,7 +137,7 @@ flink test
 flink + kafka rocks
 hello again
 ```
-
+then ctrl + c
 ```bash
 docker logs -f flink-taskmanager
 ```
