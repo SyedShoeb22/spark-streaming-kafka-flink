@@ -127,16 +127,15 @@ In a separate terminal, produce some Kafka messages:
 docker exec -it kafka kafka-console-producer --topic test-topic --bootstrap-server kafka:9092
 ```
 Or view logs from the TaskManager container:
-
-```bash
-
-docker logs -f flink-taskmanager
-```
 Type a few lines:
 ```bash
 flink test
 flink + kafka rocks
 hello again
+```
+
+```bash
+docker logs -f flink-taskmanager
 ```
 ✅ 6. See output in Flink logs
 In your Flink JobManager container logs, you’ll now see lines like:
