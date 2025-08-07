@@ -120,7 +120,11 @@ CREATE TABLE print_sink (
 -- Stream data
 INSERT INTO print_sink
 SELECT * FROM kafka_source;
+
+exit;
 ```
+Then exit from the container and run following commands
+
 ✅ 3. Send messages to the topic
 In a separate terminal, produce some Kafka messages:
 ```bash
