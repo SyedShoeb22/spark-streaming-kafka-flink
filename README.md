@@ -76,6 +76,7 @@ Create a directory to store the required JARs:
 
 ```bash
 mkdir -p ./jars/
+wget https://repo1.maven.org/maven2/org/apache/flink/flink-connector-kafka/3.0.2-1.18/flink-connector-kafka-3.0.2-1.18.jar -P ./jars/
 wget https://repo1.maven.org/maven2/org/apache/kafka/kafka-clients/3.6.1/kafka-clients-3.6.1.jar -P ./jars/
 wget https://repo1.maven.org/maven2/org/apache/kafka/kafka-clients/3.6.1/kafka-clients-3.6.1.jar -P ./jars/
 
