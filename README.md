@@ -126,6 +126,12 @@ In a separate terminal, produce some Kafka messages:
 ```bash
 docker exec -it kafka kafka-console-producer --topic test-topic --bootstrap-server kafka:9092
 ```
+Or view logs from the TaskManager container:
+
+```bash
+
+docker logs -f flink-taskmanager
+```
 Type a few lines:
 ```bash
 flink test
