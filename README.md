@@ -68,6 +68,27 @@ spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0 /tmp/sp
 ```
 
 🧪 Example 2: Flink Kafka Streaming Job (Flink SQL CLI)
+## Steps
+
+### 1. Download Kafka Connector JARs
+
+Create a directory to store the required JARs:
+
+```bash
+mkdir -p ./jars/
+wget https://repo1.maven.org/maven2/org/apache/flink/flink-connector-kafka/1.18.0/flink-connector-kafka-1.18.0.jar -P ./jars/
+wget https://repo1.maven.org/maven2/org/apache/flink/flink-connector-kafka/3.0.1/flink-connector-kafka-3.0.1.jar -P ./jars/
+wget https://repo1.maven.org/maven2/org/apache/flink/flink-connector-kafka/3.0.2-1.18/flink-connector-kafka-3.0.2-1.18.jar -P ./jars/
+wget https://repo1.maven.org/maven2/org/apache/kafka/kafka-clients/3.6.1/kafka-clients-3.6.1.jar -P ./jars/
+
+docker cp ./jars/flink-connector-kafka-3.0.2-1.18.jar flink-jobmanager:/opt/flink/lib/
+docker cp ./jars/kafka-clients-3.6.1.jar flink-jobmanager:/opt/flink/lib/
+
+docker cp ./jars/flink-connector-kafka-3.0.2-1.18.jar flink-taskmanager:/opt/flink/lib/
+docker cp ./jars/kafka-clients-3.6.1.jar flink-taskmanager:/opt/flink/lib/
+docker restart flink-jobmanager flink-taskmanager
+docker exec -it flink-jobmanager bash
+```
 Step 1: Start Flink SQL CLI:
 ```bash
 
