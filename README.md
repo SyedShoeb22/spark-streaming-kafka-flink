@@ -42,17 +42,13 @@ spark.sparkContext.setLogLevel("WARN")
 df = spark.readStream.format("kafka") \
     .option("kafka.bootstrap.servers", "kafka:9092") \
     .option("subscribe", "test-topic") \
-    .option("startingOffsets", "latest") \
+    .option("startingOffsets", "earliest") \
     .load()
 
-# Convert binary to string
-value_df = df.selectExpr("CAST(value AS STRING) as message")
+# Just print raw value
+value_df = df.selectExpr("CAST(value AS STRING) as value")
 
-# Simple transformation
-words_df = value_df.selectExpr("split(message, ' ') as words")
-
-# Output to console
-query = words_df.writeStream \
+query = value_df.writeStream \
     .outputMode("append") \
     .format("console") \
     .start()
