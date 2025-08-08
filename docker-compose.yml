@@ -44,7 +44,7 @@ services:
       SPARK_MODE: worker
       SPARK_MASTER_URL: spark://spark:7077
 
-  flink-jobmanager:
+flink-jobmanager:
     image: flink:1.18.0-scala_2.12
     container_name: flink-jobmanager
     ports:
@@ -52,6 +52,7 @@ services:
     command: jobmanager
     environment:
       - JOB_MANAGER_RPC_ADDRESS=flink-jobmanager
+      - FLINK_PROPERTIES=taskmanager.numberOfTaskSlots:4
 
   flink-taskmanager:
     image: flink:1.18.0-scala_2.12
@@ -61,6 +62,7 @@ services:
     command: taskmanager
     environment:
       - JOB_MANAGER_RPC_ADDRESS=flink-jobmanager
+      - FLINK_PROPERTIES=taskmanager.numberOfTaskSlots:4
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
